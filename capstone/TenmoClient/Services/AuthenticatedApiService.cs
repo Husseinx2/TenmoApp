@@ -71,6 +71,14 @@ namespace TenmoClient.Services
             client.Authenticator = null;
         }
 
+        public decimal GetBalance()
+        {
+            RestRequest request = new RestRequest($"account/{user.UserId}");
+            IRestResponse<decimal> response = client.Get<decimal>(request);
+            CheckForError(response);
+            return response.Data;
+        }
+
         /// <summary>
         /// Checks RestSharp response for errors. If error, writes a log message and throws an exception 
         /// if the call was not successful. If no error, just returns to caller.

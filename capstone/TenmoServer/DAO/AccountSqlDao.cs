@@ -11,7 +11,6 @@ namespace TenmoServer.DAO
     public class AccountSqlDao : IAccountDao
     {
         private readonly string connectionString;
-        const decimal StartingBalance = 1000M;
 
         public AccountSqlDao(string dbConnectionString)
         {
