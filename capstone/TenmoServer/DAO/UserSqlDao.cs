@@ -150,24 +150,6 @@ namespace TenmoServer.DAO
             return newUser;
         }
 
-        public decimal GetBalance(int userId)
-        {
-            decimal balance = 0;
-            string sql = "SELECT balance FROM account WHERE user_id = @user_id ";
-
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                conn.Open();
-
-                using (SqlCommand cmd = new SqlCommand(sql, conn))
-                {
-                    cmd.Parameters.AddWithValue("@user_id", userId);
-                    balance = Convert.ToDecimal(cmd.ExecuteScalar());
-                }
-            }
-            return balance;
-        }
-
         private User MapRowToUser(SqlDataReader reader)
         {
             User user = new User();
