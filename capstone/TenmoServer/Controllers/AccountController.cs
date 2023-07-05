@@ -22,7 +22,7 @@ namespace TenmoServer.Controllers
         [HttpGet("{id}/balance")]
         public ActionResult<decimal> GetBalance(int id)
         {
-            return Ok(accountDao.GetBalance(id));
+            return Ok(accountDao.GetBalanceByUserID(id));
         }
 
         [HttpGet("{id}")]

@@ -17,9 +17,34 @@ namespace TenmoServer.DAO
             connectionString = dbConnectionString;
         }
 
-      public Transfer SendMoney(int accountTo, decimal amount)
-        {
-            return new Transfer();
+         public Transfer CreateTransfer(Transfer transfer)
+        { 
+            string sql = "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from , account_to, amount) " +
+                "OUTPUT INSERTED.transfer_id VALUES (@transfer_type_id, @transfer_status_id, @account_from, @account_to, @amount)";
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@transfer_type_id", transfer.TransferTypeId);
+                        cmd.Parameters.AddWithValue("@transfer_status_id", transfer.TransferStatusId);
+                        cmd.Parameters.AddWithValue("@account_from", transfer.AccountFrom);
+                        cmd.Parameters.AddWithValue("@account_to", transfer.AccountTo);
+                        cmd.Parameters.AddWithValue("@amount", transfer.Amount);
+
+                        transfer.TransferId = (int)cmd.ExecuteScalar();
+
+                    }
+                }
+            }
+            catch(SqlException)
+            {
+                throw new DaoException();
+            }
+
+            return transfer;
         }
 
 

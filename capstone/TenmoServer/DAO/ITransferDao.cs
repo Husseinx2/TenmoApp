@@ -5,6 +5,6 @@ namespace TenmoServer.DAO
 {
     public interface ITransferDao
     {
-        Transfer SendMoney(int accountTo, decimal amount);   
+        Transfer CreateTransfer(Transfer transfer);
     }
 }

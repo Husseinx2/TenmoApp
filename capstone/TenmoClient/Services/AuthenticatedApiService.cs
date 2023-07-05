@@ -73,52 +73,12 @@ namespace TenmoClient.Services
             client.Authenticator = null;
         }
 
-        public decimal GetBalance()
-        {
-            RestRequest request = new RestRequest($"account/{user.UserId}/balance");
-            IRestResponse<decimal> response = client.Get<decimal>(request);
-            CheckForError(response);
-            return response.Data;
-        }
+     
 
-        public IList<ApiUser> Users()
-        {
-            RestRequest request = new RestRequest($"transfer");
-            IRestResponse<IList<ApiUser>> response = client.Get<IList<ApiUser>>(request);
-            CheckForError(response);
-            return response.Data;
-        }
+     
+     
 
-        public int GetAccountId(int userId)
-        {
-            RestRequest request = new RestRequest($"account/{user.UserId}");
-            IRestResponse<int> response = client.Get<int>(request);
-            CheckForError(response);
-            return response.Data;
-        }
-
-        public bool Send(int recipientUserId, decimal amount)
-        {
-            bool result = false;
-            Transfer transfer = new Transfer();
-
-            int senderUserId = user.UserId;
-            transfer.AccountFrom = GetAccountId(senderUserId);
-
-            transfer.AccountTo = GetAccountId(recipientUserId);
-
-            // Todo change this
-            transfer.TransferId = 0;
-
-            transfer.TransferTypeId = 2;
-            transfer.TransferStatusId = 1;
-           
-            transfer.Amount = amount;
-
-            // TODO add client.post
-
-            return result;
-        }
+    
 
         /// <summary>
         /// Checks RestSharp response for errors. If error, writes a log message and throws an exception 

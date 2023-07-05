@@ -13,18 +13,34 @@ namespace TenmoServer.Controllers
     [Authorize]
     public class TransferController : ControllerBase
     {
-        private ITransferDao transferDao;
+        private readonly ITransferDao transferDao;
+        private readonly IAccountDao accountDao;
         private readonly IUserDao userDao;
-        public TransferController(ITransferDao transferDao, IUserDao userDao)
+        public TransferController(ITransferDao transferDao, IUserDao userDao, IAccountDao accountDao)
         {
             this.transferDao = transferDao;
             this.userDao = userDao;
+            this.accountDao = accountDao;
+
         }
 
         [HttpGet()]
         public ActionResult<IList<User>> ListUsers()
         {
             return Ok(userDao.GetUsers());
+        }
+        [HttpPost()]
+        public ActionResult<Transfer> Send (Transfer transfer)
+        {    
+            decimal accountBalance = accountDao.GetBalanceByAccountID(transfer.AccountFrom);
+
+            if (transfer != null && (transfer.AccountFrom != transfer.AccountTo) && (transfer.Amount > 0)
+                && (accountBalance > transfer.Amount))
+            {
+                return Ok(transferDao.CreateTransfer(transfer));
+            }
+
+            return StatusCode(400) ;
         }
 
 

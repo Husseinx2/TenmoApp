@@ -92,12 +92,8 @@ namespace TenmoClient
 
                 Console.Write("Id of the user you are sending to[0]: ");
                 int userId = console.PromptForInteger(Console.ReadLine());
-
                 Console.Write("Enter amount to send: ");
                 decimal amount= console.PromptForDecimal(Console.ReadLine());
-
-
-
             }
 
             if (menuSelection == 5)
@@ -177,7 +173,10 @@ namespace TenmoClient
            // Todo Make table
            foreach(ApiUser user in tenmoApiService.Users())
             {
-                Console.WriteLine(user.UserId + " " + user.Username);
+                if (user.UserId != tenmoApiService.UserId)
+                {
+                    Console.WriteLine(user.UserId + " " + user.Username);
+                }
             }
             console.Pause();
         }

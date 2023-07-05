@@ -17,7 +17,25 @@ namespace TenmoServer.DAO
             connectionString = dbConnectionString;
         }
 
-        public decimal GetBalance(int userId)
+        public decimal GetBalanceByAccountID(int accountId)
+        {
+            decimal balance = 0;
+            string sql = "SELECT balance FROM account WHERE account_id = @account_id";
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@account_id", accountId);
+                    balance = Convert.ToDecimal(cmd.ExecuteScalar());
+                }
+            }
+            return balance;
+        }
+
+        public decimal GetBalanceByUserID(int userId)
         {
             decimal balance = 0;
             string sql = "SELECT balance FROM account WHERE user_id = @user_id ";
