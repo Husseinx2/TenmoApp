@@ -7,5 +7,7 @@ namespace TenmoServer.DAO
     {
         Transfer CreateTransfer(Transfer transfer);
         List<Transfer> GetTransfers(int accountId);
+        TransferStatus GetTransferStatus(int id);
+        TransferType GetTransferType(int id);
     }
 }

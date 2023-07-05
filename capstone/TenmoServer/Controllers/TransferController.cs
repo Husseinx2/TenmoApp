@@ -52,6 +52,16 @@ namespace TenmoServer.Controllers
 
             return StatusCode(400) ;
         }
+        [HttpGet("{id}/transfertype")]
+         public ActionResult<TransferType> GetTransferType(int id)
+        {
+            return Ok(transferDao.GetTransferType(id));
+        }
+        [HttpGet("{id}/transferstatus")]
+        public ActionResult<TransferStatus> GetTransferStatus(int id)
+        {
+            return Ok(transferDao.GetTransferStatus(id));
+        }
 
 
     }

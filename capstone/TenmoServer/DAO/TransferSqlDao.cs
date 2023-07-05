@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Data.SqlClient;
 using System.Security.Cryptography.Xml;
 using TenmoServer.Exceptions;
@@ -76,6 +77,61 @@ namespace TenmoServer.DAO
 
             return transferList;
         }
+
+        public TransferStatus GetTransferStatus(int id)
+        {
+            TransferStatus transferStatus = new TransferStatus();
+            string sql = "SELECT * FROM transfer_status WHERE transfer_status_id = @transfer_status_id";
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@transfer_status_id", id);
+
+                        SqlDataReader reader = cmd.ExecuteReader();
+                        if(reader.Read())
+                        {
+                            transferStatus = MapRowToTransferStatus(reader);
+                        }
+                    }
+                }
+            }
+            catch (SqlException)
+            {
+                throw new DaoException();
+            }
+            return transferStatus;
+        }
+        public TransferType GetTransferType(int id)
+        {
+            TransferType transferType = new TransferType();
+            string sql = "SELECT * FROM transfer_type WHERE transfer_type_id = @transfer_type_id";
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@transfer_type_id", id);
+
+                        SqlDataReader reader = cmd.ExecuteReader();
+                        if (reader.Read())
+                        {
+                            transferType =MapRowToTransferType(reader);
+                        }
+                    }
+                }
+            }
+            catch (SqlException)
+            {
+                throw new DaoException();
+            }
+            return transferType;
+        }
         private Transfer MapRowToTransfer(SqlDataReader reader)
         {
             Transfer transfer = new Transfer();
@@ -87,6 +143,23 @@ namespace TenmoServer.DAO
             transfer.Amount = Convert.ToDecimal(reader["amount"]);
 
             return transfer;
+        }
+        private TransferStatus MapRowToTransferStatus(SqlDataReader reader)
+        {
+            TransferStatus transferStatus = new TransferStatus();
+            transferStatus.Id = Convert.ToInt32(reader["transfer_status_id"]);
+            transferStatus.Desc = Convert.ToString(reader["transfer_status_desc"]);
+
+
+            return transferStatus;
+        }
+        private TransferType MapRowToTransferType(SqlDataReader reader)
+        {
+            TransferType transferType = new TransferType();
+            transferType.Id = Convert.ToInt32(reader["transfer_type_id"]);
+            transferType.Desc = Convert.ToString(reader["transfer_type_desc"]);
+
+            return transferType;
         }
     }
 }

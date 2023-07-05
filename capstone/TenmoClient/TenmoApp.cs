@@ -205,8 +205,25 @@ namespace TenmoClient
                 Console.WriteLine($"{transfer.TransferId} {fromToDisplay} {transfer.Amount}");       
             }
 
+            int result = console.PromptForInteger("Select transfer Id [0 to cancel]");
+          
+            if (result != 0)
+            {
+                foreach (Transfer transfer in transfers)
+                {
+                    if (transfer.TransferId == result)
+                    {
+                       
+                    }
+                }
+            }
+            
+
+
+
             console.Pause();
         }
 
+        
     }
 }
