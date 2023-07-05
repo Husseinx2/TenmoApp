@@ -7,7 +7,7 @@ namespace TenmoServer.DAO
     {
        public decimal GetBalanceByUserID(int userId);
         public decimal GetBalanceByAccountID(int accountId);
-
+        public decimal IncrementBalance(int accountId, decimal amount);
         public int GetAccountId(int userId);
     }
 }

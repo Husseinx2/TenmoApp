@@ -29,6 +29,13 @@ namespace TenmoServer.Controllers
         {
             return Ok(userDao.GetUsers());
         }
+
+        [HttpGet("{id}")]
+        public ActionResult<IList<Transfer>> GetTransfers(int id)
+        {
+            return Ok(transferDao.GetTransfers(id));
+        }
+
         [HttpPost()]
         public ActionResult<Transfer> Send (Transfer transfer)
         {    
@@ -37,6 +44,9 @@ namespace TenmoServer.Controllers
             if (transfer != null && (transfer.AccountFrom != transfer.AccountTo) && (transfer.Amount > 0)
                 && (accountBalance > transfer.Amount))
             {
+                accountDao.IncrementBalance(transfer.AccountFrom, -transfer.Amount);
+                accountDao.IncrementBalance(transfer.AccountTo, transfer.Amount);
+
                 return Ok(transferDao.CreateTransfer(transfer));
             }
 

@@ -30,7 +30,7 @@ namespace TenmoClient.Services
 
         public int GetAccountId(int userId)
         {
-            RestRequest request = new RestRequest($"account/{UserId}");
+            RestRequest request = new RestRequest($"account/{userId}");
             IRestResponse<int> response = client.Get<int>(request);
             CheckForError(response);
             return response.Data;
@@ -56,6 +56,14 @@ namespace TenmoClient.Services
                 return result;
         }
 
+        public List<Transfer> GetTransfers()
+        {
+            int accountId = GetAccountId(UserId);
 
+            RestRequest request = new RestRequest($"transfer/{accountId}");
+            IRestResponse<List<Transfer>> response = client.Get<List<Transfer>>(request);
+            CheckForError(response);
+            return response.Data;
+        }
     }
 }

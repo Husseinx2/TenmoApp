@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Security.Cryptography.Xml;
 using TenmoServer.Exceptions;
 using TenmoServer.Models;
 using TenmoServer.Security;
@@ -47,7 +48,34 @@ namespace TenmoServer.DAO
             return transfer;
         }
 
+        public List<Transfer> GetTransfers(int accountId)
+        {
+            List<Transfer> transferList = new List<Transfer>();
+            string sql = "SELECT * FROM transfer WHERE account_from = @account_id OR account_to = @account_id";
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@account_id", accountId);
 
+                        SqlDataReader reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            transferList.Add(MapRowToTransfer(reader));
+                        }
+                    }
+                }       
+            }
+            catch (SqlException)
+            {
+                throw new DaoException();
+            }
+
+            return transferList;
+        }
         private Transfer MapRowToTransfer(SqlDataReader reader)
         {
             Transfer transfer = new Transfer();

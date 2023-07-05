@@ -19,57 +19,104 @@ namespace TenmoServer.DAO
 
         public decimal GetBalanceByAccountID(int accountId)
         {
-            decimal balance = 0;
-            string sql = "SELECT balance FROM account WHERE account_id = @account_id";
-
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            try
             {
-                conn.Open();
+                decimal balance = 0;
+                string sql = "SELECT balance FROM account WHERE account_id = @account_id";
 
-                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    cmd.Parameters.AddWithValue("@account_id", accountId);
-                    balance = Convert.ToDecimal(cmd.ExecuteScalar());
+                    conn.Open();
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@account_id", accountId);
+                        balance = Convert.ToDecimal(cmd.ExecuteScalar());
+                    }
                 }
+                return balance;
             }
-            return balance;
+            catch (SqlException)
+            {
+                throw new DaoException();
+            }
         }
 
         public decimal GetBalanceByUserID(int userId)
         {
-            decimal balance = 0;
-            string sql = "SELECT balance FROM account WHERE user_id = @user_id ";
-
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            try
             {
-                conn.Open();
+                decimal balance = 0;
+                string sql = "SELECT balance FROM account WHERE user_id = @user_id ";
 
-                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    cmd.Parameters.AddWithValue("@user_id", userId);
-                    balance = Convert.ToDecimal(cmd.ExecuteScalar());
+                    conn.Open();
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@user_id", userId);
+                        balance = Convert.ToDecimal(cmd.ExecuteScalar());
+                    }
                 }
+                return balance;
             }
-            return balance;
+            catch (SqlException)
+            {
+                throw new DaoException();
+            }
         }
 
         public int GetAccountId(int userId)
         {
-            int accountId = 0;
-            string sql = "SELECT account_id FROM account WHERE user_id = @user_id ";
-
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            try
             {
-                conn.Open();
+                int accountId = 0;
+                string sql = "SELECT account_id FROM account WHERE user_id = @user_id ";
 
-                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    cmd.Parameters.AddWithValue("@user_id", userId);
-                    accountId = Convert.ToInt32(cmd.ExecuteScalar());
+                    conn.Open();
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@user_id", userId);
+                        accountId = Convert.ToInt32(cmd.ExecuteScalar());
+                    }
+                }
+                return accountId;
+            }
+            catch (SqlException)
+            {
+                throw new DaoException();
+            }
+        }
+
+        public decimal IncrementBalance(int accountId, decimal amount)
+        {
+            try
+            {
+                string sql = "UPDATE account SET balance = balance + @amount WHERE account_id = @account_id ";
+
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@amount", amount);
+                        cmd.Parameters.AddWithValue("@account_id", accountId);
+                        return Convert.ToDecimal(cmd.ExecuteScalar());
+                    }
                 }
             }
-            return accountId;
+            catch (SqlException)
+            {
+                throw new DaoException();
+            }
+
         }
+
         private Account MapRowToAccount(SqlDataReader reader)
         {
             Account account = new Account();

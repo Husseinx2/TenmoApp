@@ -79,6 +79,7 @@ namespace TenmoClient
             if (menuSelection == 2)
             {
                 // View your past transfers
+                GetTransfers();
             }
 
             if (menuSelection == 3)
@@ -90,10 +91,12 @@ namespace TenmoClient
             {
                 ListUsers();
 
-                Console.Write("Id of the user you are sending to[0]: ");
-                int userId = console.PromptForInteger(Console.ReadLine());
-                Console.Write("Enter amount to send: ");
-                decimal amount= console.PromptForDecimal(Console.ReadLine());
+                int recipientId = console.PromptForInteger("Id of the user you are sending to[0]");
+                decimal amount = console.PromptForDecimal("Enter amount to send");
+
+                SendMoney(recipientId, amount);
+
+                console.Pause();
             }
 
             if (menuSelection == 5)
@@ -170,17 +173,40 @@ namespace TenmoClient
         }
         public void ListUsers()
         {
-           // Todo Make table
-           foreach(ApiUser user in tenmoApiService.Users())
+            // Todo Make table
+            foreach (ApiUser user in tenmoApiService.Users())
             {
                 if (user.UserId != tenmoApiService.UserId)
                 {
                     Console.WriteLine(user.UserId + " " + user.Username);
                 }
             }
-            console.Pause();
         }
 
+        private void SendMoney(int recipientId, decimal amount)
+        {
+            if (tenmoApiService.Send(recipientId, amount))
+            {
+                Console.WriteLine("Transfer successful.");
+            }
+
+        }
+        private void GetTransfers()
+        {
+            List<Transfer> transfers = tenmoApiService.GetTransfers();
+
+            foreach (Transfer transfer in transfers)
+            {
+                int accountId = tenmoApiService.GetAccountId(tenmoApiService.UserId);
+                // TODO update name after to and from
+                string fromToDisplay = accountId == transfer.AccountTo ? $"From: " : $"To: ";
+
+                // TODO Make table
+                Console.WriteLine($"{transfer.TransferId} {fromToDisplay} {transfer.Amount}");       
+            }
+
+            console.Pause();
+        }
 
     }
 }
