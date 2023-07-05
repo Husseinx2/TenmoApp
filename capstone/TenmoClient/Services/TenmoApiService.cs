@@ -65,5 +65,21 @@ namespace TenmoClient.Services
             CheckForError(response);
             return response.Data;
         }
+
+        public string GetTransferStatus(int transferId)
+        {
+            RestRequest request = new RestRequest($"transfer/transferstatus/{transferId}");
+            IRestResponse<string> response = client.Get<string>(request);
+            CheckForError(response);
+            return response.Data;
+        }
+
+        public string GetTransferType(int transferId)
+        {
+            RestRequest request = new RestRequest($"transfer/transfertype/{transferId}");
+            IRestResponse<string> response = client.Get<string>(request);
+            CheckForError(response);
+            return response.Data;
+        }
     }
 }

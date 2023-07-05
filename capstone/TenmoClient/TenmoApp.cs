@@ -78,7 +78,6 @@ namespace TenmoClient
 
             if (menuSelection == 2)
             {
-                // View your past transfers
                 GetTransfers();
             }
 
@@ -213,7 +212,14 @@ namespace TenmoClient
                 {
                     if (transfer.TransferId == result)
                     {
-                       
+                        // TODO update name after to and from
+                       Console.WriteLine($"Id: {transfer.TransferId}");
+                       Console.WriteLine($"From: {transfer.AccountFrom}");
+                       Console.WriteLine($"To: {transfer.AccountTo}");
+                       Console.WriteLine($"Type: {tenmoApiService.GetTransferType(transfer.TransferTypeId)}");
+                       Console.WriteLine($"Status: {tenmoApiService.GetTransferStatus(transfer.TransferStatusId)}");
+                        Console.WriteLine($"Amount: {transfer.Amount}");
+
                     }
                 }
             }
