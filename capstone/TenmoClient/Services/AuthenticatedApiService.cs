@@ -1,5 +1,7 @@
 ﻿using RestSharp;
 using RestSharp.Authenticators;
+using System.Collections;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using TenmoClient.Models;
@@ -75,6 +77,14 @@ namespace TenmoClient.Services
         {
             RestRequest request = new RestRequest($"account/{user.UserId}");
             IRestResponse<decimal> response = client.Get<decimal>(request);
+            CheckForError(response);
+            return response.Data;
+        }
+
+        public IList<ApiUser> Users ()
+        {
+            RestRequest request = new RestRequest($"transfer");
+            IRestResponse<IList<ApiUser>> response = client.Get<IList<ApiUser>>(request);
             CheckForError(response);
             return response.Data;
         }
