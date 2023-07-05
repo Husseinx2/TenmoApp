@@ -158,10 +158,17 @@ namespace TenmoClient
             }
             console.Pause();
         }
-        private void GetBalance()
+        public void GetBalance()
         {
             Console.WriteLine($"Your current account balance is: {tenmoApiService.GetBalance():C2}");
             console.Pause();
+        }
+        public void ListUsers()
+        {
+           foreach(ApiUser user in tenmoApiService.Users())
+            {
+                Console.WriteLine(user.UserId + " " + user.Username);
+            }
         }
     }
 }
