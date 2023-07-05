@@ -35,6 +35,23 @@ namespace TenmoServer.DAO
             return balance;
         }
 
+        public int GetAccountId(int userId)
+        {
+            int accountId = 0;
+            string sql = "SELECT account_id FROM account WHERE user_id = @user_id ";
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@user_id", userId);
+                    accountId = Convert.ToInt32(cmd.ExecuteScalar());
+                }
+            }
+            return accountId;
+        }
         private Account MapRowToAccount(SqlDataReader reader)
         {
             Account account = new Account();
