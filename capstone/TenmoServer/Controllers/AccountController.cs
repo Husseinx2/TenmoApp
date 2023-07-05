@@ -4,11 +4,13 @@ using TenmoServer.DAO;
 using TenmoServer.Exceptions;
 using TenmoServer.Models;
 using TenmoServer.Security;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TenmoServer.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+    [Authorize]
     public class AccountController : ControllerBase
     {
         public IAccountDao accountDao;

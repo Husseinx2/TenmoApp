@@ -161,6 +161,7 @@ namespace TenmoClient
         private void GetBalance()
         {
             Console.WriteLine($"Your current account balance is: {tenmoApiService.GetBalance():C2}");
+            console.Pause();
         }
     }
 }
