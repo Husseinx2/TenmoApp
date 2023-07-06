@@ -21,7 +21,7 @@ namespace TenmoClient.Services
 
         public IList<ApiUser> Users()
         {
-            RestRequest request = new RestRequest($"transfer");
+            RestRequest request = new RestRequest($"users");
             IRestResponse<IList<ApiUser>> response = client.Get<IList<ApiUser>>(request);
             CheckForError(response);
             return response.Data;
@@ -54,6 +54,13 @@ namespace TenmoClient.Services
                 CheckForError(response);
                 result = response.IsSuccessful;
                 return result;
+        }
+        public string GetUserName(int accountId)
+        {
+            RestRequest request = new RestRequest($"users/username/{accountId}");
+            IRestResponse<string> response = client.Get<string>(request);
+            CheckForError(response);
+            return response.Data;
         }
 
         public List<Transfer> GetTransfers()

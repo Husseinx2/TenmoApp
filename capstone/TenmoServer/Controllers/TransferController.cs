@@ -15,25 +15,19 @@ namespace TenmoServer.Controllers
     {
         private readonly ITransferDao transferDao;
         private readonly IAccountDao accountDao;
-        private readonly IUserDao userDao;
-        public TransferController(ITransferDao transferDao, IUserDao userDao, IAccountDao accountDao)
+ 
+        public TransferController(ITransferDao transferDao, IAccountDao accountDao)
         {
             this.transferDao = transferDao;
-            this.userDao = userDao;
+            
             this.accountDao = accountDao;
 
         }
 
-        [HttpGet()]
-        public ActionResult<IList<User>> ListUsers()
+        [HttpGet("{accountId}")]
+        public ActionResult<IList<Transfer>> GetTransfers(int accountId)
         {
-            return Ok(userDao.GetUsers());
-        }
-
-        [HttpGet("{id}")]
-        public ActionResult<IList<Transfer>> GetTransfers(int id)
-        {
-            return Ok(transferDao.GetTransfers(id));
+            return Ok(transferDao.GetTransfers(accountId));
         }
 
         [HttpPost()]
@@ -52,17 +46,16 @@ namespace TenmoServer.Controllers
 
             return StatusCode(400) ;
         }
-        [HttpGet("{id}/transfertype")]
-         public ActionResult<TransferType> GetTransferType(int id)
+        [HttpGet("transfertype/{transferTypeId}")]
+         public ActionResult<TransferType> GetTransferType(int transferTypeId)
         {
-            return Ok(transferDao.GetTransferType(id));
+            return Ok(transferDao.GetTransferType(transferTypeId));
         }
-        [HttpGet("{id}/transferstatus")]
-        public ActionResult<TransferStatus> GetTransferStatus(int id)
+        [HttpGet("transferstatus/{transferStatusId}")]
+        public ActionResult<TransferStatus> GetTransferStatus(int transferStatusId)
         {
-            return Ok(transferDao.GetTransferStatus(id));
+            return Ok(transferDao.GetTransferStatus(transferStatusId));
         }
-
 
     }
 }
