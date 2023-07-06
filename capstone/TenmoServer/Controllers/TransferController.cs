@@ -49,12 +49,12 @@ namespace TenmoServer.Controllers
         [HttpGet("transfertype/{transferTypeId}")]
          public ActionResult<TransferType> GetTransferType(int transferTypeId)
         {
-            return Ok(transferDao.GetTransferType(transferTypeId));
+            return Ok(transferDao.GetTransferType(transferTypeId).Desc);
         }
         [HttpGet("transferstatus/{transferStatusId}")]
         public ActionResult<TransferStatus> GetTransferStatus(int transferStatusId)
         {
-            return Ok(transferDao.GetTransferStatus(transferStatusId));
+            return Ok(transferDao.GetTransferStatus(transferStatusId).Desc);
         }
 
     }

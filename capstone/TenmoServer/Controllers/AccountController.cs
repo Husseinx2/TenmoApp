@@ -19,16 +19,16 @@ namespace TenmoServer.Controllers
             this.accountDao = accountDao;
         }
 
-        [HttpGet("{id}/balance")]
-        public ActionResult<decimal> GetBalance(int id)
+        [HttpGet("{userId}/balance")]
+        public ActionResult<decimal> GetBalance(int userId)
         {
-            return Ok(accountDao.GetBalanceByUserID(id));
+            return Ok(accountDao.GetBalanceByUserID(userId));
         }
 
-        [HttpGet("{id}")]
-        public ActionResult<decimal> GetAccountId(int id)
+        [HttpGet("{userId}")]
+        public ActionResult<decimal> GetAccountId(int userId)
         {
-            return Ok(accountDao.GetAccountId(id));
+            return Ok(accountDao.GetAccountId(userId));
         }
     }
 }

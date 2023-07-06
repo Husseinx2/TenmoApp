@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Reflection.Metadata.Ecma335;
+using System.Threading.Channels;
 using TenmoClient.Models;
 using TenmoClient.Services;
 
@@ -180,7 +183,6 @@ namespace TenmoClient
             const int Width2 = 26;
             string cat1 = "Id";
             string cat2 = "Username";
-            // Todo Make table
             Console.WriteLine(console.Border(headerLine));
             Console.WriteLine(console.Border($"{cat1,Width1} | {cat2,-Width2}"));
             Console.WriteLine(console.Border(sectionLine));
@@ -199,7 +201,19 @@ namespace TenmoClient
 
         private void SendMoney(int recipientId, decimal amount)
         {
-            if (tenmoApiService.Send(recipientId, amount))
+            if (amount <= 0)
+            {
+                Console.WriteLine("Enter a valid Amount.");
+            }
+            else if (amount > tenmoApiService.GetBalance())
+            {
+                Console.WriteLine("Insufficient Funds");
+            }
+            else if (recipientId == tenmoApiService.UserId)
+            {
+                Console.WriteLine("Enter a Valid User");
+            }
+            else if (tenmoApiService.Send(recipientId, amount))
             {
                 Console.WriteLine("Transfer successful.");
             }
@@ -207,36 +221,60 @@ namespace TenmoClient
         private void GetTransfers()
         {
             List<Transfer> transfers = tenmoApiService.GetTransfers();
-
-            foreach (Transfer transfer in transfers)
+            if (transfers == null)
             {
-                int accountId = tenmoApiService.GetAccountId(tenmoApiService.UserId);
-                // TODO update name after to and from
-                string fromToDisplay = accountId == transfer.AccountTo ? $"From: " : $"To: ";
 
-                // TODO Make table
-                Console.WriteLine($"{transfer.TransferId} {fromToDisplay} {transfer.Amount}");       
+                Console.WriteLine("No Transfers Available");
+                console.Pause();
+                return;
             }
 
-            int result = console.PromptForInteger("Select transfer Id [0 to cancel]");
-          
-            if (result != 0)
+            const int IdWidth = 12;
+            const int FromTo = 25;
+            string line = "-------------------------------------------";
+            Console.WriteLine(line);
+            Console.WriteLine("Transfers");
+            Console.WriteLine("ID".PadRight(IdWidth) + "From/To".PadRight(FromTo) + "Amount");
+            Console.WriteLine(line);
+            try
             {
                 foreach (Transfer transfer in transfers)
                 {
-                    if (transfer.TransferId == result)
-                    {
-                        // TODO update name after to and from
-                       Console.WriteLine($"Id: {transfer.TransferId}");
-                       Console.WriteLine($"From: {transfer.AccountFrom}");
-                       Console.WriteLine($"To: {transfer.AccountTo}");
-                       Console.WriteLine($"Type: {tenmoApiService.GetTransferType(transfer.TransferTypeId)}");
-                       Console.WriteLine($"Status: {tenmoApiService.GetTransferStatus(transfer.TransferStatusId)}");
-                        Console.WriteLine($"Amount: {transfer.Amount}");
+                    int accountId = tenmoApiService.GetAccountId(tenmoApiService.UserId);
+                    string fromToDisplay = accountId == transfer.AccountTo ? $"From: {tenmoApiService.GetUserName(transfer.AccountFrom)} " : $"To: {tenmoApiService.GetUserName(transfer.AccountTo)} ";
+                    Console.WriteLine($"{transfer.TransferId,-IdWidth}{fromToDisplay,-FromTo}{transfer.Amount:c2}");
+                }
 
+
+                int result = console.PromptForInteger("Select transfer Id [0 to cancel]");
+
+                if (result != 0)
+                {
+                    foreach (Transfer transfer in transfers)
+                    {
+                        if (transfer.TransferId == result)
+                        {
+
+                            Console.WriteLine(line);
+                            Console.WriteLine("Transfer Details");
+                            Console.WriteLine(line);
+                            Console.WriteLine($"Id: {transfer.TransferId}");
+                            Console.WriteLine($"From: {tenmoApiService.GetUserName(transfer.AccountFrom)}");
+                            Console.WriteLine($"To: {tenmoApiService.GetUserName(transfer.AccountTo)}");
+                            Console.WriteLine($"Type: {tenmoApiService.GetTransferType(transfer.TransferTypeId)}");
+                            Console.WriteLine($"Status: {tenmoApiService.GetTransferStatus(transfer.TransferStatusId)}");
+                            Console.WriteLine($"Amount: {transfer.Amount:C2}");
+                            break;
+                        }
                     }
+
                 }
             }
+            catch (HttpRequestException)
+            {
+                Console.WriteLine("There was a problem reaching the Server");
+            }
+
             console.Pause();
         }
 
