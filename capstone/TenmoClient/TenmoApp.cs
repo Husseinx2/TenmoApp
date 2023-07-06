@@ -172,14 +172,29 @@ namespace TenmoClient
         }
         public void ListUsers()
         {
+            string headerLine = "-------------- Users --------------";
+            string sectionLine = "-------+---------------------------";
+            string endLine = "-----------------------------------";
+
+            const int Width1 = 6;
+            const int Width2 = 26;
+            string cat1 = "Id";
+            string cat2 = "Username";
             // Todo Make table
+            Console.WriteLine(console.Border(headerLine));
+            Console.WriteLine(console.Border($"{cat1,Width1} | {cat2,-Width2}"));
+            Console.WriteLine(console.Border(sectionLine));
+
+
             foreach (ApiUser user in tenmoApiService.Users())
             {
                 if (user.UserId != tenmoApiService.UserId)
                 {
-                    Console.WriteLine(user.UserId + " " + user.Username);
+                    Console.WriteLine(console.Border($"{user.UserId,Width1} | {user.Username,-Width2}"));
                 }
             }
+            Console.WriteLine(console.Border(endLine));
+
         }
 
         private void SendMoney(int recipientId, decimal amount)
@@ -188,7 +203,6 @@ namespace TenmoClient
             {
                 Console.WriteLine("Transfer successful.");
             }
-
         }
         private void GetTransfers()
         {
@@ -223,13 +237,9 @@ namespace TenmoClient
                     }
                 }
             }
-            
-
-
-
             console.Pause();
         }
 
-        
+
     }
 }

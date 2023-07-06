@@ -242,5 +242,24 @@ namespace TenmoClient.Services
                 PrintError($"Invalid number, please try again.");
             }
         }
+
+        public string Border(string str)
+        {
+            return $"|{str}|";
+        }
+
+    /*    public string HorizontalLine(int length, string str = "")
+        {
+            string dashes = "-----------------------------------";
+            if (str == "")
+            {
+                return dashes;
+            }
+
+            string centeredString = $" {str} ";
+            
+            
+        }*/
+            
     }
 }
