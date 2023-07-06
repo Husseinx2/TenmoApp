@@ -1,3 +1,4 @@
+
 ﻿using RestSharp;
 using System.Collections.Generic;
 using TenmoClient.Models;
@@ -62,13 +63,28 @@ namespace TenmoClient.Services
             CheckForError(response);
             return response.Data;
         }
-
         public List<Transfer> GetTransfers()
         {
             int accountId = GetAccountId(UserId);
 
             RestRequest request = new RestRequest($"transfer/{accountId}");
             IRestResponse<List<Transfer>> response = client.Get<List<Transfer>>(request);
+            CheckForError(response);
+            return response.Data;
+        }
+
+        public string GetTransferStatus(int transferId)
+        {
+            RestRequest request = new RestRequest($"transfer/transferstatus/{transferId}");
+            IRestResponse<string> response = client.Get<string>(request);
+            CheckForError(response);
+            return response.Data;
+        }
+
+        public string GetTransferType(int transferId)
+        {
+            RestRequest request = new RestRequest($"transfer/transfertype/{transferId}");
+            IRestResponse<string> response = client.Get<string>(request);
             CheckForError(response);
             return response.Data;
         }
