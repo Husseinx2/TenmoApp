@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Reflection.Metadata.Ecma335;
@@ -237,6 +238,10 @@ namespace TenmoClient
             {
                 console.PrintSuccess("Transfer successful.");
             }
+            else
+            {
+                console.PrintError("request failed.");
+            }
         }
         private void GetTransfers()
         {
@@ -300,23 +305,23 @@ namespace TenmoClient
                 {
                     // TODO Possibly create dictionary variable (key: TransferId, value: index of transfers)
                     // TODO Possible refactor Transfer details to another method
-                    foreach (Transfer transfer in transfers)
+                            Transfer transfer = GetTransferByTransferId(transferIdInput);
+                    if (transfer != null)
                     {
-                        if (transfer.TransferId == transferIdInput)
-                        {
-                            Console.WriteLine(tableLine);
-                            Console.WriteLine("Transfer Details");
-                            Console.WriteLine(tableLine);
-                            Console.WriteLine($"Id: {transfer.TransferId}");
-                            Console.WriteLine($"From: {tenmoApiService.GetUserName(transfer.AccountFrom)}");
-                            Console.WriteLine($"To: {tenmoApiService.GetUserName(transfer.AccountTo)}");
-                            Console.WriteLine($"Type: {tenmoApiService.GetTransferType(transfer.TransferTypeId)}");
-                            Console.WriteLine($"Status: {tenmoApiService.GetTransferStatus(transfer.TransferStatusId)}");
-                            Console.WriteLine($"Amount: {transfer.Amount:C2}");
-                            break;
-                        }
+                        Console.WriteLine(tableLine);
+                        Console.WriteLine("Transfer Details");
+                        Console.WriteLine(tableLine);
+                        Console.WriteLine($"Id: {transfer.TransferId}");
+                        Console.WriteLine($"From: {tenmoApiService.GetUserName(transfer.AccountFrom)}");
+                        Console.WriteLine($"To: {tenmoApiService.GetUserName(transfer.AccountTo)}");
+                        Console.WriteLine($"Type: {tenmoApiService.GetTransferType(transfer.TransferTypeId)}");
+                        Console.WriteLine($"Status: {tenmoApiService.GetTransferStatus(transfer.TransferStatusId)}");
+                        Console.WriteLine($"Amount: {transfer.Amount:C2}");
                     }
-
+                    else
+                    {
+                        Console.WriteLine("Invalid Transfer Id");
+                    }
                 }
             }
             catch (HttpRequestException)
@@ -328,6 +333,7 @@ namespace TenmoClient
         }
         private void GetPendingRequests()
         {
+            bool isUpdated = true;
             List<Transfer> transfers = tenmoApiService.GetTransfers();
 
             if (transfers == null)
@@ -371,6 +377,34 @@ namespace TenmoClient
                     }
                 }
                 Console.WriteLine(tableLine);
+                int requestId = console.PromptForInteger("Please enter transfer ID to approve/reject (0 to cancel)");
+                if (requestId != 0)
+                {
+                    Console.WriteLine("1: Approve");
+                    Console.WriteLine("2: Reject");
+                    Console.WriteLine("0: Don't approve or reject");
+                    Console.WriteLine(tableLine);
+                    int result = console.PromptForInteger("Please choose an option", 0, 2);
+                    if (result != 0)
+                    {
+                        Transfer transfer = GetTransferByTransferId(requestId);
+                        if (transfer != null)
+                        {
+                            transfer.TransferStatusId = result + 1;
+                            isUpdated = tenmoApiService.UpdateRequest(transfer);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid Transfer Id");
+                        }
+                       
+                        if (isUpdated)
+                        {
+                            console.PrintSuccess("request updated");
+                        }
+                    }
+
+                }
             }
             catch (HttpRequestException)
             {
@@ -393,6 +427,24 @@ namespace TenmoClient
             {
                 console.PrintSuccess("Request sent.");
             }
+            else
+            {
+                console.PrintError("request failed.");
+            }
         }
+
+        public Transfer GetTransferByTransferId(int transferId)
+        {
+            List<Transfer> transfers = tenmoApiService.GetTransfers();
+            foreach (Transfer transfer in transfers)
+            {
+                if (transfer.TransferId ==  transferId)
+                {
+                    return transfer;
+                }
+            }
+            return null;
+        }
+
     }
 }

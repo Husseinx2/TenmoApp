@@ -57,6 +57,25 @@ namespace TenmoServer.Controllers
 
             return StatusCode(400);
         }
+        [HttpPost("request/update")]
+        public ActionResult<Transfer> UpdateRequest(Transfer transfer)
+        {
+            decimal accountBalance = accountDao.GetBalanceByAccountID(transfer.AccountFrom);
+
+            if (transfer != null && (transfer.AccountFrom != transfer.AccountTo) && (transfer.Amount > 0)
+                && (accountBalance > transfer.Amount) && (transfer.TransferStatusId == 2))
+            {
+                accountDao.IncrementBalance(transfer.AccountFrom, -transfer.Amount);
+                accountDao.IncrementBalance(transfer.AccountTo, transfer.Amount);
+                return Ok(transferDao.UpdateTransfer(transfer));
+            }
+           else if (transfer.TransferStatusId == 3)
+            {
+                return Ok(transferDao.UpdateTransfer(transfer));
+            }
+            return StatusCode(404);
+            
+        } 
 
         [HttpGet("transfertype/{transferTypeId}")]
          public ActionResult<TransferType> GetTransferType(int transferTypeId)

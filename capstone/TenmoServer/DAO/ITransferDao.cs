@@ -9,5 +9,6 @@ namespace TenmoServer.DAO
         List<Transfer> GetTransfers(int accountId);
         TransferStatus GetTransferStatus(int id);
         TransferType GetTransferType(int id);
+        Transfer UpdateTransfer(Transfer transfer);
     }
 }

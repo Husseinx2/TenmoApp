@@ -76,7 +76,32 @@ namespace TenmoServer.DAO
 
             return transferList;
         }
+        public Transfer UpdateTransfer(Transfer transfer)
+        {
+           
+            string sql = "Update transfer set transfer_status_id = @transfer_status_id WHERE transfer_id = @transfer_id";
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@transfer_status_id", transfer.TransferStatusId);
+                        cmd.Parameters.AddWithValue("@transfer_id", transfer.TransferId);
+                        cmd.ExecuteNonQuery();  
+                    }
+                }
+            }
+            catch (SqlException)
+            {
+                throw new DaoException();
+            }
 
+            return transfer;
+
+
+        }
         public TransferStatus GetTransferStatus(int id)
         {
             TransferStatus transferStatus = new TransferStatus();

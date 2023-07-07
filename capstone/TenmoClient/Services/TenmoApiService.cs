@@ -1,5 +1,6 @@
 
 using RestSharp;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using TenmoClient.Models;
@@ -97,6 +98,22 @@ namespace TenmoClient.Services
             }
             return result;
         }
+        public bool UpdateRequest(Transfer transfer)
+        {
+            bool result = false;
+            try
+            {
+                RestRequest request = new RestRequest("transfer/request/update");
+                request.AddJsonBody(transfer);
+                IRestResponse<Transfer> response = client.Post<Transfer>(request);
+                result = response.IsSuccessful;
+            }
+            catch(HttpRequestException)
+            {
+                return result;
+            }
+            return result;
+        }
 
         public List<Transfer> GetTransfers()
         {
@@ -113,6 +130,7 @@ namespace TenmoClient.Services
                 return null;
             }
         }
+
 
         public string GetTransferStatus(int transferId)
         {
