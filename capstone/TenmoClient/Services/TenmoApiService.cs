@@ -48,7 +48,7 @@ namespace TenmoClient.Services
 
         public bool Send(int recipientUserId, decimal amount)
         {
-            bool result = false;
+            bool result;
             try
             {
                 Transfer transfer = new Transfer();
@@ -59,7 +59,33 @@ namespace TenmoClient.Services
                 transfer.TransferStatusId = 2;
                 transfer.Amount = amount;
 
-                RestRequest request = new RestRequest($"transfer");
+                RestRequest request = new RestRequest($"transfer/send");
+                request.AddJsonBody(transfer);
+                IRestResponse<Transfer> response = client.Post<Transfer>(request);
+                CheckForError(response);
+                result = response.IsSuccessful;
+            }
+            catch (HttpRequestException)
+            {
+                return false;
+            }
+            return result;
+        }
+
+        public bool Request(int requesteeUserId, decimal amount)
+        {
+            bool result;
+            try
+            {
+                Transfer transfer = new Transfer();
+                int requesterUserId = UserId;
+                transfer.AccountFrom = GetAccountId(requesteeUserId);
+                transfer.AccountTo = GetAccountId(requesterUserId);
+                transfer.TransferTypeId = 1;
+                transfer.TransferStatusId = 1;
+                transfer.Amount = amount;
+
+                RestRequest request = new RestRequest($"transfer/request");
                 request.AddJsonBody(transfer);
                 IRestResponse<Transfer> response = client.Post<Transfer>(request);
                 CheckForError(response);

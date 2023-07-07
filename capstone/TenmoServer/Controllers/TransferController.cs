@@ -30,7 +30,7 @@ namespace TenmoServer.Controllers
             return Ok(transferDao.GetTransfers(accountId));
         }
 
-        [HttpPost()]
+        [HttpPost("send")]
         public ActionResult<Transfer> Send (Transfer transfer)
         {    
             decimal accountBalance = accountDao.GetBalanceByAccountID(transfer.AccountFrom);
@@ -46,6 +46,18 @@ namespace TenmoServer.Controllers
 
             return StatusCode(400) ;
         }
+
+        [HttpPost("request")]
+        public ActionResult<Transfer> TransferRequest(Transfer transfer)
+        {
+            if (transfer != null && (transfer.AccountFrom != transfer.AccountTo))
+            {
+                return Ok(transferDao.CreateTransfer(transfer));
+            }
+
+            return StatusCode(400);
+        }
+
         [HttpGet("transfertype/{transferTypeId}")]
          public ActionResult<TransferType> GetTransferType(int transferTypeId)
         {

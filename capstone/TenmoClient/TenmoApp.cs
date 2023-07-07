@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Reflection.Metadata.Ecma335;
@@ -87,7 +88,7 @@ namespace TenmoClient
 
             if (menuSelection == 3)
             {
-                // View your pending requests
+                GetPendingRequests();
             }
 
             if (menuSelection == 4)
@@ -104,7 +105,14 @@ namespace TenmoClient
 
             if (menuSelection == 5)
             {
-                // Request TE bucks
+                ListUsers();
+
+                int requesteeId = console.PromptForInteger("Id of the user you are requesting from[0]");
+                decimal amount = console.PromptForDecimal("Enter amount to request");
+
+                RequestMoney(requesteeId, amount);
+
+                console.Pause();
             }
 
             if (menuSelection == 6)
@@ -116,6 +124,8 @@ namespace TenmoClient
 
             return true;    // Keep the main menu loop going
         }
+
+
 
         private void Login()
         {
@@ -179,7 +189,7 @@ namespace TenmoClient
             const int LineWidth = 35;
             const int IdWidth = 6;
             const int UsernameWidth = 26;
-      
+
             string tableLine = new string('-', LineWidth);
 
             string title = "Users";
@@ -225,7 +235,7 @@ namespace TenmoClient
             }
             else if (tenmoApiService.Send(recipientId, amount))
             {
-                Console.WriteLine("Transfer successful.");
+                console.PrintSuccess("Transfer successful.");
             }
         }
         private void GetTransfers()
@@ -258,25 +268,28 @@ namespace TenmoClient
             {
                 foreach (Transfer transfer in transfers)
                 {
-                    int accountId = tenmoApiService.GetAccountId(tenmoApiService.UserId);
-                    
-                    // If logged in user is recipient, fromToDisplay shows sender username
-                    // If logged in user is sender, fromToDisplay shows recipient username
-                    string fromToDisplay;
-                    if (accountId == transfer.AccountTo)
+                    if (transfer.TransferStatusId == 2)
                     {
-                        string senderUsername = tenmoApiService.GetUserName(transfer.AccountFrom);
-                        fromToDisplay = $"From: {senderUsername} ";
-                    } 
-                    else
-                    {
-                        string recipientUsername = tenmoApiService.GetUserName(transfer.AccountTo);
-                        fromToDisplay = $"To: {recipientUsername} ";
-                    }
+                        int accountId = tenmoApiService.GetAccountId(tenmoApiService.UserId);
 
-                    string transferDisplay = $"{transfer.Amount:c2}";
-                    string transferDataRow = $"{transfer.TransferId,-IdWidth}{fromToDisplay,-FromToWidth}{transferDisplay,AmountWidth}";
-                    Console.WriteLine(transferDataRow);
+                        // If logged in user is recipient, fromToDisplay shows sender username
+                        // If logged in user is sender, fromToDisplay shows recipient username
+                        string fromToDisplay;
+                        if (accountId == transfer.AccountTo)
+                        {
+                            string senderUsername = tenmoApiService.GetUserName(transfer.AccountFrom);
+                            fromToDisplay = $"From: {senderUsername} ";
+                        }
+                        else
+                        {
+                            string recipientUsername = tenmoApiService.GetUserName(transfer.AccountTo);
+                            fromToDisplay = $"To: {recipientUsername} ";
+                        }
+
+                        string transferDisplay = $"{transfer.Amount:c2}";
+                        string transferDataRow = $"{transfer.TransferId,-IdWidth}{fromToDisplay,-FromToWidth}{transferDisplay,AmountWidth}";
+                        Console.WriteLine(transferDataRow);
+                    }
                 }
                 Console.WriteLine(tableLine);
 
@@ -312,6 +325,74 @@ namespace TenmoClient
             }
 
             console.Pause();
+        }
+        private void GetPendingRequests()
+        {
+            List<Transfer> transfers = tenmoApiService.GetTransfers();
+
+            if (transfers == null)
+            {
+                Console.WriteLine("No Pending Transfers Available");
+                console.Pause();
+                return;
+            }
+
+            const int IdWidth = 12;
+            const int FromToWidth = 25;
+            const int AmountWidth = 6;
+            const int LineWidth = IdWidth + FromToWidth + AmountWidth;
+
+            string tableLine = new string('-', LineWidth);
+            string title = "Pending Transfers";
+
+            string header = "ID".PadRight(IdWidth) + "To".PadRight(FromToWidth) + "Amount ".PadLeft(AmountWidth);
+
+            Console.WriteLine(tableLine);
+            Console.WriteLine(title);
+            Console.WriteLine(header);
+            Console.WriteLine(tableLine);
+
+            try
+            {
+                foreach (Transfer transfer in transfers)
+                {
+                    if (transfer.TransferStatusId == 1 && transfer.AccountFrom == tenmoApiService.GetAccountId(tenmoApiService.UserId))
+                    {
+                        int accountId = tenmoApiService.GetAccountId(tenmoApiService.UserId);
+
+                        // If logged in user is recipient, fromToDisplay shows sender username
+                        // If logged in user is sender, fromToDisplay shows recipient username
+                        string requesterUsername = tenmoApiService.GetUserName(transfer.AccountTo);
+                        string fromToDisplay = $"To: {requesterUsername} ";
+
+                        string transferDisplay = $"{transfer.Amount:c2}";
+                        string transferDataRow = $"{transfer.TransferId,-IdWidth}{fromToDisplay,-FromToWidth}{transferDisplay,AmountWidth}";
+                        Console.WriteLine(transferDataRow);
+                    }
+                }
+                Console.WriteLine(tableLine);
+            }
+            catch (HttpRequestException)
+            {
+                Console.WriteLine("There was a problem reaching the Server");
+            }
+            console.Pause();
+        }
+
+        private void RequestMoney(int requesteeId, decimal amount)
+        {
+            if (amount <= 0)
+            {
+                Console.WriteLine("Enter a valid Amount.");
+            }
+            else if (requesteeId == tenmoApiService.UserId)
+            {
+                Console.WriteLine("Enter a Valid User");
+            }
+            else if (tenmoApiService.Request(requesteeId, amount))
+            {
+                console.PrintSuccess("Request sent.");
+            }
         }
     }
 }
