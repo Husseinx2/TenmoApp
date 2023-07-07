@@ -126,8 +126,6 @@ namespace TenmoClient
             return true;    // Keep the main menu loop going
         }
 
-
-
         private void Login()
         {
             LoginUser loginUser = console.PromptForLogin();
@@ -224,15 +222,15 @@ namespace TenmoClient
         {
             if (amount <= 0)
             {
-                Console.WriteLine("Enter a valid Amount.");
+                Console.WriteLine("Enter a valid amount.");
             }
             else if (amount > tenmoApiService.GetBalance())
             {
-                Console.WriteLine("Insufficient Funds");
+                Console.WriteLine("Insufficient funds.");
             }
             else if (recipientId == tenmoApiService.UserId)
             {
-                Console.WriteLine("Enter a Valid User");
+                Console.WriteLine("Enter a valid user.");
             }
             else if (tenmoApiService.Send(recipientId, amount))
             {
@@ -240,7 +238,7 @@ namespace TenmoClient
             }
             else
             {
-                console.PrintError("request failed.");
+                console.PrintError("Request failed.");
             }
         }
         private void GetTransfers()
@@ -277,8 +275,8 @@ namespace TenmoClient
                     {
                         int accountId = tenmoApiService.GetAccountId(tenmoApiService.UserId);
 
-                        // If logged in user is recipient, fromToDisplay shows sender username
-                        // If logged in user is sender, fromToDisplay shows recipient username
+                        // If logged in user is recipient, toDisplay shows sender username
+                        // If logged in user is sender, toDisplay shows recipient username
                         string fromToDisplay;
                         if (accountId == transfer.AccountTo)
                         {
@@ -298,14 +296,11 @@ namespace TenmoClient
                 }
                 Console.WriteLine(tableLine);
 
-                // TODO Add message if transferIdInput is invalid or loop prompt until it is valid
                 int transferIdInput = console.PromptForInteger("Select transfer Id [0 to cancel]");
 
                 if (transferIdInput != 0)
                 {
-                    // TODO Possibly create dictionary variable (key: TransferId, value: index of transfers)
-                    // TODO Possible refactor Transfer details to another method
-                            Transfer transfer = GetTransferByTransferId(transferIdInput);
+                    Transfer transfer = GetTransferByTransferId(transfers, transferIdInput);
                     if (transfer != null)
                     {
                         Console.WriteLine(tableLine);
@@ -320,20 +315,20 @@ namespace TenmoClient
                     }
                     else
                     {
-                        Console.WriteLine("Invalid Transfer Id");
+                        console.PrintError("Invalid Transfer Id");
                     }
                 }
             }
             catch (HttpRequestException)
             {
-                Console.WriteLine("There was a problem reaching the Server");
+                console.PrintError("There was a problem reaching the server");
             }
 
             console.Pause();
         }
         private void GetPendingRequests()
         {
-            bool isUpdated = true;
+            bool isUpdated = false;
             List<Transfer> transfers = tenmoApiService.GetTransfers();
 
             if (transfers == null)
@@ -362,17 +357,15 @@ namespace TenmoClient
             {
                 foreach (Transfer transfer in transfers)
                 {
-                    if (transfer.TransferStatusId == 1 && transfer.AccountFrom == tenmoApiService.GetAccountId(tenmoApiService.UserId))
+                    int accountId = tenmoApiService.GetAccountId(tenmoApiService.UserId);
+                    if (transfer.TransferStatusId == 1 && transfer.AccountFrom == accountId)
                     {
-                        int accountId = tenmoApiService.GetAccountId(tenmoApiService.UserId);
 
-                        // If logged in user is recipient, fromToDisplay shows sender username
-                        // If logged in user is sender, fromToDisplay shows recipient username
                         string requesterUsername = tenmoApiService.GetUserName(transfer.AccountTo);
-                        string fromToDisplay = $"To: {requesterUsername} ";
+                        string toDisplay = $"To: {requesterUsername}";
 
                         string transferDisplay = $"{transfer.Amount:c2}";
-                        string transferDataRow = $"{transfer.TransferId,-IdWidth}{fromToDisplay,-FromToWidth}{transferDisplay,AmountWidth}";
+                        string transferDataRow = $"{transfer.TransferId,-IdWidth}{toDisplay,-FromToWidth}{transferDisplay,AmountWidth}";
                         Console.WriteLine(transferDataRow);
                     }
                 }
@@ -380,35 +373,59 @@ namespace TenmoClient
                 int requestId = console.PromptForInteger("Please enter transfer ID to approve/reject (0 to cancel)");
                 if (requestId != 0)
                 {
-                    Console.WriteLine("1: Approve");
-                    Console.WriteLine("2: Reject");
-                    Console.WriteLine("0: Don't approve or reject");
-                    Console.WriteLine(tableLine);
-                    int result = console.PromptForInteger("Please choose an option", 0, 2);
-                    if (result != 0)
+                    Transfer transfer = GetTransferByTransferId(transfers, requestId);
+                    if (transfer != null)
                     {
-                        Transfer transfer = GetTransferByTransferId(requestId);
-                        if (transfer != null)
+                        Console.WriteLine("1: Approve");
+                        Console.WriteLine("2: Reject");
+                        Console.WriteLine("0: Don't approve or reject");
+                        Console.WriteLine(tableLine);
+                        int optionInput = console.PromptForInteger("Please choose an option", 0, 2);
+                        if (optionInput != 0)
                         {
-                            transfer.TransferStatusId = result + 1;
-                            isUpdated = tenmoApiService.UpdateRequest(transfer);
+                            transfer.TransferStatusId = optionInput + 1;
+                            if (transfer.TransferStatusId == 2)
+                            {
+                                if (transfer.Amount <= 0)
+                                {
+                                    Console.WriteLine("Enter a valid amount.");
+                                }
+                                else if (transfer.Amount > tenmoApiService.GetBalance())
+                                {
+                                    Console.WriteLine("Insufficient funds.");
+                                }
+                                else if (transfer.AccountTo == tenmoApiService.UserId)
+                                {
+                                    Console.WriteLine("Invalid user.");
+                                }
+                                else
+                                {
+                                    isUpdated = tenmoApiService.UpdateRequest(transfer);
+                                }
+                            }
+                            else
+                            {
+                                isUpdated = tenmoApiService.UpdateRequest(transfer);
+                            }
+                        }
+                        if (isUpdated)
+                        {
+                            console.PrintSuccess("Request updated.");
                         }
                         else
                         {
-                            Console.WriteLine("Invalid Transfer Id");
-                        }
-                       
-                        if (isUpdated)
-                        {
-                            console.PrintSuccess("request updated");
+                            console.PrintError("Request not updated.");
                         }
                     }
-
+                    else
+                    {
+                        console.PrintError("Invalid Transfer Id");
+                    }
                 }
             }
             catch (HttpRequestException)
             {
-                Console.WriteLine("There was a problem reaching the Server");
+                console.PrintError("There was a problem reaching the server");
             }
             console.Pause();
         }
@@ -417,11 +434,11 @@ namespace TenmoClient
         {
             if (amount <= 0)
             {
-                Console.WriteLine("Enter a valid Amount.");
+                console.PrintError("Enter a valid amount.");
             }
             else if (requesteeId == tenmoApiService.UserId)
             {
-                Console.WriteLine("Enter a Valid User");
+                console.PrintError("Enter a valid user");
             }
             else if (tenmoApiService.Request(requesteeId, amount))
             {
@@ -429,22 +446,21 @@ namespace TenmoClient
             }
             else
             {
-                console.PrintError("request failed.");
+                console.PrintError("Request failed.");
             }
         }
 
-        public Transfer GetTransferByTransferId(int transferId)
+        public Transfer GetTransferByTransferId(List<Transfer> transfers, int transferId)
         {
-            List<Transfer> transfers = tenmoApiService.GetTransfers();
             foreach (Transfer transfer in transfers)
             {
-                if (transfer.TransferId ==  transferId)
+                if (transfer.TransferId == transferId)
                 {
                     return transfer;
                 }
             }
+
             return null;
         }
-
     }
 }

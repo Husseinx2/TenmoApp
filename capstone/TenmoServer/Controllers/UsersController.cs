@@ -13,7 +13,6 @@ namespace TenmoServer.Controllers
     [Authorize]
     public class UsersController:ControllerBase
     {
-        
         private readonly IUserDao userDao;
         public UsersController(IUserDao userDao)
         {       

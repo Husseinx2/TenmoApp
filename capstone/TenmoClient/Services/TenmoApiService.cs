@@ -13,7 +13,6 @@ namespace TenmoClient.Services
 
         public TenmoApiService(string apiUrl) : base(apiUrl) { }
 
-
         public decimal GetBalance()
         {
             RestRequest request = new RestRequest($"account/{UserId}/balance");
@@ -37,7 +36,6 @@ namespace TenmoClient.Services
             return response.Data;
         }
 
-
         public int GetAccountId(int userId)
         {    
                 RestRequest request = new RestRequest($"account/{userId}");
@@ -45,7 +43,6 @@ namespace TenmoClient.Services
                 CheckForError(response);
                 return response.Data;          
         }
-
 
         public bool Send(int recipientUserId, decimal amount)
         {
@@ -98,6 +95,7 @@ namespace TenmoClient.Services
             }
             return result;
         }
+
         public bool UpdateRequest(Transfer transfer)
         {
             bool result = false;
@@ -130,7 +128,6 @@ namespace TenmoClient.Services
                 return null;
             }
         }
-
 
         public string GetTransferStatus(int transferId)
         {

@@ -18,8 +18,7 @@ namespace TenmoServer.Controllers
  
         public TransferController(ITransferDao transferDao, IAccountDao accountDao)
         {
-            this.transferDao = transferDao;
-            
+            this.transferDao = transferDao;  
             this.accountDao = accountDao;
 
         }
@@ -57,6 +56,7 @@ namespace TenmoServer.Controllers
 
             return StatusCode(400);
         }
+
         [HttpPost("request/update")]
         public ActionResult<Transfer> UpdateRequest(Transfer transfer)
         {
@@ -73,8 +73,8 @@ namespace TenmoServer.Controllers
             {
                 return Ok(transferDao.UpdateTransfer(transfer));
             }
-            return StatusCode(404);
-            
+
+            return StatusCode(404);         
         } 
 
         [HttpGet("transfertype/{transferTypeId}")]
@@ -87,6 +87,5 @@ namespace TenmoServer.Controllers
         {
             return Ok(transferDao.GetTransferStatus(transferStatusId).Desc);
         }
-
     }
 }

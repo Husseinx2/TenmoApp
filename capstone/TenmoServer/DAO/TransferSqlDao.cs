@@ -19,8 +19,8 @@ namespace TenmoServer.DAO
             connectionString = dbConnectionString;
         }
 
-         public Transfer CreateTransfer(Transfer transfer)
-        { 
+        public Transfer CreateTransfer(Transfer transfer)
+        {
             string sql = "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from , account_to, amount) " +
                 "OUTPUT INSERTED.transfer_id VALUES (@transfer_type_id, @transfer_status_id, @account_from, @account_to, @amount)";
             try
@@ -40,7 +40,7 @@ namespace TenmoServer.DAO
                     }
                 }
             }
-            catch(SqlException)
+            catch (SqlException)
             {
                 throw new DaoException();
             }
@@ -67,7 +67,7 @@ namespace TenmoServer.DAO
                             transferList.Add(MapRowToTransfer(reader));
                         }
                     }
-                }       
+                }
             }
             catch (SqlException)
             {
@@ -78,7 +78,7 @@ namespace TenmoServer.DAO
         }
         public Transfer UpdateTransfer(Transfer transfer)
         {
-           
+
             string sql = "Update transfer set transfer_status_id = @transfer_status_id WHERE transfer_id = @transfer_id";
             try
             {
@@ -89,7 +89,7 @@ namespace TenmoServer.DAO
                     {
                         cmd.Parameters.AddWithValue("@transfer_status_id", transfer.TransferStatusId);
                         cmd.Parameters.AddWithValue("@transfer_id", transfer.TransferId);
-                        cmd.ExecuteNonQuery();  
+                        cmd.ExecuteNonQuery();
                     }
                 }
             }
@@ -115,10 +115,12 @@ namespace TenmoServer.DAO
                     {
                         cmd.Parameters.AddWithValue("@transfer_status_id", id);
 
-                        SqlDataReader reader = cmd.ExecuteReader();
-                        if(reader.Read())
+                        using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            transferStatus = MapRowToTransferStatus(reader);
+                            if (reader.Read())
+                            {
+                                transferStatus = MapRowToTransferStatus(reader);
+                            }
                         }
                     }
                 }
@@ -145,7 +147,7 @@ namespace TenmoServer.DAO
                         SqlDataReader reader = cmd.ExecuteReader();
                         if (reader.Read())
                         {
-                            transferType =MapRowToTransferType(reader);
+                            transferType = MapRowToTransferType(reader);
                         }
                     }
                 }
@@ -156,6 +158,7 @@ namespace TenmoServer.DAO
             }
             return transferType;
         }
+
         private Transfer MapRowToTransfer(SqlDataReader reader)
         {
             Transfer transfer = new Transfer();
@@ -168,6 +171,7 @@ namespace TenmoServer.DAO
 
             return transfer;
         }
+
         private TransferStatus MapRowToTransferStatus(SqlDataReader reader)
         {
             TransferStatus transferStatus = new TransferStatus();
@@ -176,6 +180,7 @@ namespace TenmoServer.DAO
 
             return transferStatus;
         }
+
         private TransferType MapRowToTransferType(SqlDataReader reader)
         {
             TransferType transferType = new TransferType();
