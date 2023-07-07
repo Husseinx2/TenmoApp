@@ -243,23 +243,9 @@ namespace TenmoClient.Services
             }
         }
 
-        public string Border(string str)
+        public void WriteBorderLine(string str)
         {
-            return $"|{str}|";
-        }
-
-    /*    public string HorizontalLine(int length, string str = "")
-        {
-            string dashes = "-----------------------------------";
-            if (str == "")
-            {
-                return dashes;
-            }
-
-            string centeredString = $" {str} ";
-            
-            
-        }*/
-            
+            Console.WriteLine($"|{str}|");
+        }            
     }
 }

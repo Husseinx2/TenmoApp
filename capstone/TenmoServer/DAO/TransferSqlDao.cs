@@ -37,7 +37,6 @@ namespace TenmoServer.DAO
                         cmd.Parameters.AddWithValue("@amount", transfer.Amount);
 
                         transfer.TransferId = (int)cmd.ExecuteScalar();
-
                     }
                 }
             }
@@ -149,7 +148,6 @@ namespace TenmoServer.DAO
             TransferStatus transferStatus = new TransferStatus();
             transferStatus.Id = Convert.ToInt32(reader["transfer_status_id"]);
             transferStatus.Desc = Convert.ToString(reader["transfer_status_desc"]);
-
 
             return transferStatus;
         }

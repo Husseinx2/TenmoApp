@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Reflection.Metadata.Ecma335;
 using System.Threading.Channels;
@@ -175,28 +176,37 @@ namespace TenmoClient
         }
         public void ListUsers()
         {
-            string headerLine = "-------------- Users --------------";
-            string sectionLine = "-------+---------------------------";
-            string endLine = "-----------------------------------";
+            const int LineWidth = 35;
+            const int IdWidth = 6;
+            const int UsernameWidth = 26;
+      
+            string tableLine = new string('-', LineWidth);
 
-            const int Width1 = 6;
-            const int Width2 = 26;
-            string cat1 = "Id";
-            string cat2 = "Username";
-            Console.WriteLine(console.Border(headerLine));
-            Console.WriteLine(console.Border($"{cat1,Width1} | {cat2,-Width2}"));
-            Console.WriteLine(console.Border(sectionLine));
+            string title = "Users";
+            string titleDisplay = $" {title} ";
+            int titleSectionWidth = (LineWidth - titleDisplay.Length) / 2;
+            string titleLineSection = new string('-', titleSectionWidth);
+            string titleLine = $"{titleLineSection}{titleDisplay}{titleLineSection}";
 
+            string headerId = "Id";
+            string headerUsername = "Username";
+            string header = $"{headerId,IdWidth} | {headerUsername,-UsernameWidth}";
+            string headerLine = $"{tableLine.Substring(0, IdWidth + 1)}+{tableLine.Substring(IdWidth + 2)}";
+            string endLine = tableLine;
+
+            console.WriteBorderLine(titleLine);
+            console.WriteBorderLine(header);
+            console.WriteBorderLine(headerLine);
 
             foreach (ApiUser user in tenmoApiService.Users())
             {
                 if (user.UserId != tenmoApiService.UserId)
                 {
-                    Console.WriteLine(console.Border($"{user.UserId,Width1} | {user.Username,-Width2}"));
+                    string userDataRow = $"{user.UserId,IdWidth} | {user.Username,-UsernameWidth}";
+                    console.WriteBorderLine(userDataRow);
                 }
             }
-            Console.WriteLine(console.Border(endLine));
-
+            console.WriteBorderLine(endLine);
         }
 
         private void SendMoney(int recipientId, decimal amount)
@@ -221,43 +231,69 @@ namespace TenmoClient
         private void GetTransfers()
         {
             List<Transfer> transfers = tenmoApiService.GetTransfers();
+
             if (transfers == null)
             {
-
                 Console.WriteLine("No Transfers Available");
                 console.Pause();
                 return;
             }
 
             const int IdWidth = 12;
-            const int FromTo = 25;
-            string line = "-------------------------------------------";
-            Console.WriteLine(line);
-            Console.WriteLine("Transfers");
-            Console.WriteLine("ID".PadRight(IdWidth) + "From/To".PadRight(FromTo) + "Amount");
-            Console.WriteLine(line);
+            const int FromToWidth = 25;
+            const int AmountWidth = 6;
+            const int LineWidth = IdWidth + FromToWidth + AmountWidth;
+
+            string tableLine = new string('-', LineWidth);
+            string title = "Transfers";
+
+            string header = "ID".PadRight(IdWidth) + "From/To".PadRight(FromToWidth) + "Amount ".PadLeft(AmountWidth);
+
+            Console.WriteLine(tableLine);
+            Console.WriteLine(title);
+            Console.WriteLine(header);
+            Console.WriteLine(tableLine);
+
             try
             {
                 foreach (Transfer transfer in transfers)
                 {
                     int accountId = tenmoApiService.GetAccountId(tenmoApiService.UserId);
-                    string fromToDisplay = accountId == transfer.AccountTo ? $"From: {tenmoApiService.GetUserName(transfer.AccountFrom)} " : $"To: {tenmoApiService.GetUserName(transfer.AccountTo)} ";
-                    Console.WriteLine($"{transfer.TransferId,-IdWidth}{fromToDisplay,-FromTo}{transfer.Amount:c2}");
+                    
+                    // If logged in user is recipient, fromToDisplay shows sender username
+                    // If logged in user is sender, fromToDisplay shows recipient username
+                    string fromToDisplay;
+                    if (accountId == transfer.AccountTo)
+                    {
+                        string senderUsername = tenmoApiService.GetUserName(transfer.AccountFrom);
+                        fromToDisplay = $"From: {senderUsername} ";
+                    } 
+                    else
+                    {
+                        string recipientUsername = tenmoApiService.GetUserName(transfer.AccountTo);
+                        fromToDisplay = $"To: {recipientUsername} ";
+                    }
+
+                    string transferDisplay = $"{transfer.Amount:c2}";
+                    string transferDataRow = $"{transfer.TransferId,-IdWidth}{fromToDisplay,-FromToWidth}{transferDisplay,AmountWidth}";
+                    Console.WriteLine(transferDataRow);
                 }
+                Console.WriteLine(tableLine);
 
+                // TODO Add message if transferIdInput is invalid or loop prompt until it is valid
+                int transferIdInput = console.PromptForInteger("Select transfer Id [0 to cancel]");
 
-                int result = console.PromptForInteger("Select transfer Id [0 to cancel]");
-
-                if (result != 0)
+                if (transferIdInput != 0)
                 {
+                    // TODO Possibly create dictionary variable (key: TransferId, value: index of transfers)
+                    // TODO Possible refactor Transfer details to another method
                     foreach (Transfer transfer in transfers)
                     {
-                        if (transfer.TransferId == result)
+                        if (transfer.TransferId == transferIdInput)
                         {
-
-                            Console.WriteLine(line);
+                            Console.WriteLine(tableLine);
                             Console.WriteLine("Transfer Details");
-                            Console.WriteLine(line);
+                            Console.WriteLine(tableLine);
                             Console.WriteLine($"Id: {transfer.TransferId}");
                             Console.WriteLine($"From: {tenmoApiService.GetUserName(transfer.AccountFrom)}");
                             Console.WriteLine($"To: {tenmoApiService.GetUserName(transfer.AccountTo)}");
@@ -277,7 +313,5 @@ namespace TenmoClient
 
             console.Pause();
         }
-
-
     }
 }

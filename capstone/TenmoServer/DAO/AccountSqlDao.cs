@@ -114,7 +114,6 @@ namespace TenmoServer.DAO
             {
                 throw new DaoException();
             }
-
         }
 
         private Account MapRowToAccount(SqlDataReader reader)

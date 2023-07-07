@@ -19,7 +19,7 @@ namespace TenmoServer.Controllers
         {       
             this.userDao = userDao;
         }
-
+ 
         [HttpGet()]
         public ActionResult<IList<User>> ListUsers()
         {

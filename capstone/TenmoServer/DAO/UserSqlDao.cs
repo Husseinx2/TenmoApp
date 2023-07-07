@@ -17,7 +17,6 @@ namespace TenmoServer.DAO
         {
             connectionString = dbConnectionString;
         }
-
         public User GetUserById(int userId)
         {
             User user = null;
@@ -47,7 +46,7 @@ namespace TenmoServer.DAO
 
             return user;
         }
-
+    
         public User GetUserByUsername(string username)
         {
             User user = null;
