@@ -47,7 +47,8 @@ namespace TenmoServer.DAO
 
             return transfer;
         }
-
+        // TODO: Change method name to GetTransfersByAccountId
+        // TODO: Add GetTransfersByTransferId method
         public List<Transfer> GetTransfers(int accountId)
         {
             List<Transfer> transferList = new List<Transfer>();
@@ -78,7 +79,6 @@ namespace TenmoServer.DAO
         }
         public Transfer UpdateTransfer(Transfer transfer)
         {
-
             string sql = "Update transfer set transfer_status_id = @transfer_status_id WHERE transfer_id = @transfer_id";
             try
             {
@@ -99,9 +99,8 @@ namespace TenmoServer.DAO
             }
 
             return transfer;
-
-
         }
+
         public TransferStatus GetTransferStatus(int id)
         {
             TransferStatus transferStatus = new TransferStatus();

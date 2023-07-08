@@ -338,6 +338,7 @@ namespace TenmoClient
                 return;
             }
 
+            // TODO Maybe refactor table display to seperate method
             const int IdWidth = 12;
             const int FromToWidth = 25;
             const int AmountWidth = 6;
@@ -449,7 +450,7 @@ namespace TenmoClient
                 console.PrintError("Request failed.");
             }
         }
-
+        // TODO: Call GetTransferByTransferId in TenmoApiService after it's implemented which indirectly uses SQL instead of this method
         public Transfer GetTransferByTransferId(List<Transfer> transfers, int transferId)
         {
             foreach (Transfer transfer in transfers)

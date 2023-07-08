@@ -28,6 +28,7 @@ namespace TenmoClient.Services
                 return (user == null) ? "anonymous" : user.Username;
             }
         }
+
         public bool IsLoggedIn { get { return !string.IsNullOrWhiteSpace(user.Token); } }
 
         public AuthenticatedApiService(string apiUrl)
@@ -72,13 +73,6 @@ namespace TenmoClient.Services
             user = new ApiUser();
             client.Authenticator = null;
         }
-
-     
-
-     
-     
-
-    
 
         /// <summary>
         /// Checks RestSharp response for errors. If error, writes a log message and throws an exception 

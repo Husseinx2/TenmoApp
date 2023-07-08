@@ -101,9 +101,9 @@ namespace TenmoClient.Services
             bool result = false;
             try
             {
-                RestRequest request = new RestRequest("transfer/request/update");
+                RestRequest request = new RestRequest("transfer/request");
                 request.AddJsonBody(transfer);
-                IRestResponse<Transfer> response = client.Post<Transfer>(request);
+                IRestResponse<Transfer> response = client.Put<Transfer>(request);
                 result = response.IsSuccessful;
             }
             catch(HttpRequestException)
@@ -128,7 +128,7 @@ namespace TenmoClient.Services
                 return null;
             }
         }
-
+        // TODO: Add GetTransfersByTransferId
         public string GetTransferStatus(int transferId)
         {
             try

@@ -22,15 +22,15 @@ namespace TenmoServer.Controllers
             this.accountDao = accountDao;
 
         }
-
+        // TODO: Change method name to GetTransfersByAccountId
         [HttpGet("{accountId}")]
         public ActionResult<IList<Transfer>> GetTransfers(int accountId)
         {
             return Ok(transferDao.GetTransfers(accountId));
         }
-
+        // TODO: Add GetTransfersByTransferId method
         [HttpPost("send")]
-        public ActionResult<Transfer> Send (Transfer transfer)
+        public ActionResult<Transfer> Send(Transfer transfer)
         {    
             decimal accountBalance = accountDao.GetBalanceByAccountID(transfer.AccountFrom);
 
@@ -57,7 +57,7 @@ namespace TenmoServer.Controllers
             return StatusCode(400);
         }
 
-        [HttpPost("request/update")]
+        [HttpPut("request")]
         public ActionResult<Transfer> UpdateRequest(Transfer transfer)
         {
             decimal accountBalance = accountDao.GetBalanceByAccountID(transfer.AccountFrom);
