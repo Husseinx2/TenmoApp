@@ -45,7 +45,7 @@ namespace TenmoServer.Controllers
             decimal accountBalance = accountDao.GetBalanceByAccountID(transfer.AccountFrom);
 
             if (transfer != null && (transfer.AccountFrom != transfer.AccountTo) && (transfer.Amount > 0)
-                && (accountBalance > transfer.Amount))
+                && (accountBalance >= transfer.Amount))
             {
                 accountDao.IncrementBalance(transfer.AccountFrom, -transfer.Amount);
                 accountDao.IncrementBalance(transfer.AccountTo, transfer.Amount);
@@ -73,7 +73,7 @@ namespace TenmoServer.Controllers
             decimal accountBalance = accountDao.GetBalanceByAccountID(transfer.AccountFrom);
 
             if (transfer != null && (transfer.AccountFrom != transfer.AccountTo) && (transfer.Amount > 0)
-                && (accountBalance > transfer.Amount) && (transfer.TransferStatusId == 2))
+                && (accountBalance >= transfer.Amount) && (transfer.TransferStatusId == 2))
             {
                 accountDao.IncrementBalance(transfer.AccountFrom, -transfer.Amount);
                 accountDao.IncrementBalance(transfer.AccountTo, transfer.Amount);
