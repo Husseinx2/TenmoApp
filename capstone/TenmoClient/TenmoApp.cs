@@ -269,6 +269,8 @@ namespace TenmoClient
 
             try
             {
+                HashSet<int> approvedTransferIds = new HashSet<int>();
+
                 foreach (Transfer transfer in transfers)
                 {
                     if (transfer.TransferStatusId == 2)
@@ -292,17 +294,20 @@ namespace TenmoClient
                         string transferDisplay = $"{transfer.Amount:c2}";
                         string transferDataRow = $"{transfer.TransferId,-IdWidth}{fromToDisplay,-FromToWidth}{transferDisplay,AmountWidth}";
                         Console.WriteLine(transferDataRow);
+
+                        approvedTransferIds.Add(transfer.TransferId);
                     }
                 }
                 Console.WriteLine(tableLine);
 
                 int transferIdInput = console.PromptForInteger("Select transfer Id [0 to cancel]");
-                
+
                 if (transferIdInput != 0)
                 {
-                    Transfer transfer = tenmoApiService.GetTransfersByTransferId(transferIdInput);
-                    if (transfer != null)
+                    if (approvedTransferIds.Contains(transferIdInput))
                     {
+                        Transfer transfer = tenmoApiService.GetTransfersByTransferId(transferIdInput);
+
                         Console.WriteLine(tableLine);
                         Console.WriteLine("Transfer Details");
                         Console.WriteLine(tableLine);
@@ -454,6 +459,6 @@ namespace TenmoClient
                 console.PrintError("Request failed.");
             }
         }
-       
+
     }
 }
