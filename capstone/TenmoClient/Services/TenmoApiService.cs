@@ -118,7 +118,7 @@ namespace TenmoClient.Services
             try
             {
                 int accountId = GetAccountId(UserId);
-                RestRequest request = new RestRequest($"transfer/{accountId}");
+                RestRequest request = new RestRequest($"transfer/accountId/{accountId}");
                 IRestResponse<List<Transfer>> response = client.Get<List<Transfer>>(request);
                 CheckForError(response);
                 return response.Data;
@@ -129,6 +129,22 @@ namespace TenmoClient.Services
             }
         }
         // TODO: Add GetTransfersByTransferId
+
+        public Transfer GetTransfersByTransferId(int transferId)
+        {
+            try
+            {
+               
+                RestRequest request = new RestRequest($"transfer/{transferId}");
+                IRestResponse<Transfer> response = client.Get<Transfer>(request);
+                CheckForError(response);
+                return response.Data;
+            }
+            catch (HttpRequestException)
+            {
+                return null;
+            }
+        }
         public string GetTransferStatus(int transferId)
         {
             try

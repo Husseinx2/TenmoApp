@@ -300,7 +300,7 @@ namespace TenmoClient
 
                 if (transferIdInput != 0)
                 {
-                    Transfer transfer = GetTransferByTransferId(transfers, transferIdInput);
+                    Transfer transfer = tenmoApiService.GetTransfersByTransferId(transferIdInput);
                     if (transfer != null)
                     {
                         Console.WriteLine(tableLine);
@@ -374,7 +374,7 @@ namespace TenmoClient
                 int requestId = console.PromptForInteger("Please enter transfer ID to approve/reject (0 to cancel)");
                 if (requestId != 0)
                 {
-                    Transfer transfer = GetTransferByTransferId(transfers, requestId);
+                    Transfer transfer = tenmoApiService.GetTransfersByTransferId(requestId);
                     if (transfer != null)
                     {
                         Console.WriteLine("1: Approve");
@@ -450,18 +450,6 @@ namespace TenmoClient
                 console.PrintError("Request failed.");
             }
         }
-        // TODO: Call GetTransferByTransferId in TenmoApiService after it's implemented which indirectly uses SQL instead of this method
-        public Transfer GetTransferByTransferId(List<Transfer> transfers, int transferId)
-        {
-            foreach (Transfer transfer in transfers)
-            {
-                if (transfer.TransferId == transferId)
-                {
-                    return transfer;
-                }
-            }
-
-            return null;
-        }
+       
     }
 }

@@ -47,9 +47,37 @@ namespace TenmoServer.DAO
 
             return transfer;
         }
-        // TODO: Change method name to GetTransfersByAccountId
+        
         // TODO: Add GetTransfersByTransferId method
-        public List<Transfer> GetTransfers(int accountId)
+
+        public Transfer GetTransferByTransferId(int transferId)
+        {
+            Transfer transfer = new Transfer();
+            string sql = "SELECT * FROM transfer WHERE transfer_id = @transfer_id";
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@transfer_id", transferId);
+
+                        SqlDataReader reader = cmd.ExecuteReader();
+                        if (reader.Read())
+                        {
+                            transfer = MapRowToTransfer(reader);
+                        }
+                    }
+                }
+            }
+            catch (SqlException)
+            {
+                throw new DaoException();
+            }
+            return transfer;
+        }
+        public List<Transfer> GetTransfersByAccountID(int accountId)
         {
             List<Transfer> transferList = new List<Transfer>();
             string sql = "SELECT * FROM transfer WHERE account_from = @account_id OR account_to = @account_id";
