@@ -220,17 +220,23 @@ namespace TenmoClient
 
         private void SendMoney(int recipientId, decimal amount)
         {
+            HashSet<int> userIds = new HashSet<int>();
+            foreach (ApiUser user in tenmoApiService.Users())
+            {
+                userIds.Add(user.UserId);
+            }
+
             if (amount <= 0)
             {
-                Console.WriteLine("Enter a valid amount.");
+                console.PrintError("Enter a valid amount.");
             }
             else if (amount > tenmoApiService.GetBalance())
             {
-                Console.WriteLine("Insufficient funds.");
+                console.PrintError("Insufficient funds.");
             }
-            else if (recipientId == tenmoApiService.UserId)
+            else if (!userIds.Contains(recipientId) || recipientId == tenmoApiService.UserId)
             {
-                Console.WriteLine("Enter a valid user.");
+                console.PrintError("Enter a valid user.");
             }
             else if (tenmoApiService.Send(recipientId, amount))
             {
@@ -442,13 +448,19 @@ namespace TenmoClient
 
         private void RequestMoney(int requesteeId, decimal amount)
         {
+            HashSet<int> userIds = new HashSet<int>();
+            foreach (ApiUser user in tenmoApiService.Users())
+            {
+                userIds.Add(user.UserId);
+            }
+
             if (amount <= 0)
             {
                 console.PrintError("Enter a valid amount.");
             }
-            else if (requesteeId == tenmoApiService.UserId)
+            else if (!userIds.Contains(requesteeId) || requesteeId == tenmoApiService.UserId)
             {
-                console.PrintError("Enter a valid user");
+                console.PrintError("Enter a valid user id.");
             }
             else if (tenmoApiService.Request(requesteeId, amount))
             {
