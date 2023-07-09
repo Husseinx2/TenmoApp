@@ -297,7 +297,7 @@ namespace TenmoClient
                 Console.WriteLine(tableLine);
 
                 int transferIdInput = console.PromptForInteger("Select transfer Id [0 to cancel]");
-
+                
                 if (transferIdInput != 0)
                 {
                     Transfer transfer = tenmoApiService.GetTransfersByTransferId(transferIdInput);
@@ -338,7 +338,6 @@ namespace TenmoClient
                 return;
             }
 
-            // TODO Maybe refactor table display to seperate method
             const int IdWidth = 12;
             const int FromToWidth = 25;
             const int AmountWidth = 6;
@@ -356,27 +355,32 @@ namespace TenmoClient
 
             try
             {
+                HashSet<int> pendingTransferIds = new HashSet<int>();
+
                 foreach (Transfer transfer in transfers)
                 {
                     int accountId = tenmoApiService.GetAccountId(tenmoApiService.UserId);
                     if (transfer.TransferStatusId == 1 && transfer.AccountFrom == accountId)
                     {
-
                         string requesterUsername = tenmoApiService.GetUserName(transfer.AccountTo);
                         string toDisplay = $"To: {requesterUsername}";
 
                         string transferDisplay = $"{transfer.Amount:c2}";
                         string transferDataRow = $"{transfer.TransferId,-IdWidth}{toDisplay,-FromToWidth}{transferDisplay,AmountWidth}";
                         Console.WriteLine(transferDataRow);
+
+                        pendingTransferIds.Add(transfer.TransferId);
                     }
                 }
                 Console.WriteLine(tableLine);
+
                 int requestId = console.PromptForInteger("Please enter transfer ID to approve/reject (0 to cancel)");
                 if (requestId != 0)
                 {
-                    Transfer transfer = tenmoApiService.GetTransfersByTransferId(requestId);
-                    if (transfer != null)
+                    if (pendingTransferIds.Contains(requestId))
                     {
+                        Transfer transfer = tenmoApiService.GetTransfersByTransferId(requestId);
+
                         Console.WriteLine("1: Approve");
                         Console.WriteLine("2: Reject");
                         Console.WriteLine("0: Don't approve or reject");

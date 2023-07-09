@@ -22,19 +22,17 @@ namespace TenmoServer.Controllers
             this.accountDao = accountDao;
 
         }
-        // TODO: Change method name to GetTransfersByAccountId
-        [HttpGet("accountId/{accountId}")]
+        
+        [HttpGet("account/{accountId}")]
         public ActionResult<IList<Transfer>> GetTransfersByAccountID(int accountId)
         {
             return Ok(transferDao.GetTransfersByAccountID(accountId));
         }
-        // TODO: Add GetTransfersByTransferId method
 
         [HttpGet("{transferId}")] 
         public ActionResult<Transfer> GetTransferByTransferId(int transferId)
         {
-            Transfer transfer = new Transfer();
-            transfer = transferDao.GetTransferByTransferId(transferId);
+            Transfer transfer = transferDao.GetTransferByTransferId(transferId);
             if (transfer == null)
             {
                 return StatusCode(404);

@@ -47,12 +47,11 @@ namespace TenmoServer.DAO
 
             return transfer;
         }
-        
-        // TODO: Add GetTransfersByTransferId method
+
 
         public Transfer GetTransferByTransferId(int transferId)
         {
-            Transfer transfer = new Transfer();
+            Transfer transfer = null;
             string sql = "SELECT * FROM transfer WHERE transfer_id = @transfer_id";
             try
             {
@@ -63,10 +62,12 @@ namespace TenmoServer.DAO
                     {
                         cmd.Parameters.AddWithValue("@transfer_id", transferId);
 
-                        SqlDataReader reader = cmd.ExecuteReader();
-                        if (reader.Read())
+                        using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            transfer = MapRowToTransfer(reader);
+                            if (reader.Read())
+                            {
+                                transfer = MapRowToTransfer(reader);
+                            }
                         }
                     }
                 }
@@ -131,7 +132,7 @@ namespace TenmoServer.DAO
 
         public TransferStatus GetTransferStatus(int id)
         {
-            TransferStatus transferStatus = new TransferStatus();
+            TransferStatus transferStatus = null;
             string sql = "SELECT * FROM transfer_status WHERE transfer_status_id = @transfer_status_id";
             try
             {
@@ -160,7 +161,7 @@ namespace TenmoServer.DAO
         }
         public TransferType GetTransferType(int id)
         {
-            TransferType transferType = new TransferType();
+            TransferType transferType = null;
             string sql = "SELECT * FROM transfer_type WHERE transfer_type_id = @transfer_type_id";
             try
             {
